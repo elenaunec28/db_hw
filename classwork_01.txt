@@ -4,12 +4,50 @@
 // Рецензии на Rotten Tomatoes содержатся во вложенном документе Tomatoes.
 // Отсортируйте результаты в порядке возрастания даты выпуска.
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'tomatoes.viewer.rating': {
+                '$gt': 4.5
+            }
+        }
+    }, {
+        '$sort': {
+            'released': 1
+        }
+    }, {
+        '$project': {
+            'raiting': '$tomatoes.viewer.rating', 
+            'released': 1, 
+            '_id': 0
+        }
+    }
+])
 
 
 // 2. Для фильмов жанра «Драма» и из США, покажите их
 //    сюжет (plot), продолжительность (runtime) и название (title).
 // Упорядочите результаты по убыванию продолжительности.
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'genres': 'Drama', 
+            'countries': 'USA'
+        }
+    }, {
+        '$project': {
+            'plot': 1, 
+            'runtime': 1, 
+            'title': 1, 
+            '_id': 0
+        }
+    }, {
+        '$sort': {
+            'runtime': -1
+        }
+    }
+])
 
 
 
@@ -18,6 +56,29 @@
 // Упорядочите результаты по убыванию продолжительности.
 
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'genres': {
+                '$all': [
+                    'Drama', 'Fantasy'
+                ]
+            }, 
+            'countries': 'USA'
+        }
+    }, {
+        '$project': {
+            'plot': 1, 
+            'runtime': 1, 
+            'title': 1, 
+            '_id': 0
+        }
+    }, {
+        '$sort': {
+            'runtime': -1
+        }
+    }
+])
 
 
 // 4. Найдите фильмы, удовлетворяющие всем следующим условиям:
@@ -28,5 +89,31 @@
 // Выведите название, год выхода и длительность и не показывайте идентификатор документа .
 // Отсортируйте результаты по возрастанию рейтинга IMDB.
 
-
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'year': {
+                '$gte': '1900', 
+                '$lte': '1910'
+            }, 
+            'imdb.rating': {
+                '$gt': 7.0
+            }, 
+            'awards': {
+                '$exists': True
+            }
+        }
+    }, {
+        '$project': {
+            'year': 1, 
+            'runtime': 1, 
+            'title': 1, 
+            '_id': 0
+        }
+    }, {
+        '$sort': {
+            'imdb.rating': 1
+        }
+    }
+])
 
