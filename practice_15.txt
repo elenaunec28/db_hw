@@ -1,28 +1,212 @@
 use ich;
 
 // 1. Из коллекции ich.imdb найти фильмы или сериалы, в которых не указан режиссер.
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'directors': {
+                '$exists': False
+            }
+        }
+    }
+])
 
 // 2. Из коллекции ich.imdb найти фильмы, произведенные в США и Франции
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'countries': {
+                '$all': [
+                    'USA', 'France'
+                ]
+            }
+        }
+    }
+])
 // 3. Из коллекции ich.imdb найти фильмы на китайском
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'languages': 'Chinese'
+        }
+    }
+])
 // 4. Из коллекции ich.imdb найти фильмы на китайском или на французском
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'languages': {
+                '$in': [
+                    'Chinese', 'French'
+                ]
+            }
+        }
+    }
+])
 // 5. Найти фильмы, жанры которых 'Mystery' и 'Sci-Fi'
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'genres': {
+                '$all': [
+                    'Mystery', 'Sci-Fi'
+                ]
+            }
+        }
+    }
+])
 // 6. Найти фильмы, жанры которых 'Mystery' ИЛИ 'Sci-Fi'
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'genres': {
+                '$in': [
+                    'Mystery', 'Sci-Fi'
+                ]
+            }
+        }
+    }
+])
 // 7. Найти самый новый фильм без отметки рейтинга
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'imdb.rating': ''
+        }
+    }, {
+        '$sort': {
+            'released': -1
+        }
+    }, {
+        '$limit': 1
+    }
+])
 // 8. Найти  длительность (runtime) и тип (type) сериала Berlin Alexanderplatz
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'title': 'Berlin Alexanderplatz'
+        }
+    }, {
+        '$project': {
+            'title': 1, 
+            'runtime': 1, 
+            'type': 1, 
+            '_id': 0
+        }
+    }
+])
 // 9. Найти самый длинный сериал
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'type': 'series'
+        }
+    }, {
+        '$sort': {
+            'runtime': -1
+        }
+    }, {
+        '$limit': 1
+    }
+])
 /* 10. Найти сериал или фильм с самым высоким рейтингом.
 В коллекции есть документы без рейтинга или с пустым значением.
 Попробовать несколько вариантов, в том числе не оптимальный */
+# Requires the PyMongo package.
+# https://api.mongodb.com/python/current
 
+client = MongoClient('mongodb://ich1:password@mongo.itcareerhub.de/?readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=ich')
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            '$and': [
+                {
+                    'imdb.rating': {
+                        '$ne': None
+                    }
+                }, {
+                    'imdb.rating': {
+                        '$ne': ''
+                    }
+                }, {
+                    'imdb.rating': {
+                        '$exists': True
+                    }
+                }
+            ], 
+            'type': {
+                '$in': [
+                    'movie', 'series'
+                ]
+            }
+        }
+    }, {
+        '$sort': {
+            'imdb.rating': -1
+        }
+    }, {
+        '$limit': 1
+    }
+])
+
+
+
+
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'imdb.rating': {
+                '$ne': None, 
+                '$ne': '', 
+                '$exists': True
+            }, 
+            'type': {
+                '$in': [
+                    'movie', 'series'
+                ]
+            }
+        }
+    }, {
+        '$sort': {
+            'imdb.rating': -1
+        }
+    }, {
+        '$limit': 1
+    }
+])
 // 11. Найти топ 10 фильмов по рейтингу imdb из 1989 года
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'type': 'movie', 
+            'year': '1989'
+        }
+    }, {
+        '$sort': {
+            'imdb.rating': -1
+        }
+    }, {
+        '$limit': 10
+    }
+])
 // 12. У скольких фильмов есть 2 победы в наградах (2 wins.)?
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'awards': '2 wins.'
+        }
+    }, {
+        '$count': 'total'
+    }
+])
