@@ -18,10 +18,7 @@ result = client['ich_edit']['06032026_ptm_Elena'].find(
   filter=filter
 )
 // 2. Вывести данные о всех представительницах женского пола и людях старше 30 лет.
-# Requires the PyMongo package.
-# https://api.mongodb.com/python/current
 
-client = MongoClient('mongodb://ich_editor:verystrongpassword@mongo.edu.itcareerhub.de:27017/?readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=ich_edit')
 result = client['ich_edit']['06032026_ptm_Elena'].aggregate([
     {
         '$match': {
@@ -38,10 +35,7 @@ result = client['ich_edit']['06032026_ptm_Elena'].aggregate([
     }
 ])
 // 3. Вывести всех пользователей, у которых имя входит в список (Анатолий, Дмитрий, Ольга, Семен)
-# Requires the PyMongo package.
-# https://api.mongodb.com/python/current
 
-client = MongoClient('mongodb://ich_editor:verystrongpassword@mongo.edu.itcareerhub.de:27017/?readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=ich_edit')
 result = client['ich_edit']['06032026_ptm_Elena'].aggregate([
     {
         '$match': {
@@ -54,10 +48,7 @@ result = client['ich_edit']['06032026_ptm_Elena'].aggregate([
     }
 ])
 // 4. Вывести пользователя с идентификатором 3
-# Requires the PyMongo package.
-# https://api.mongodb.com/python/current
 
-client = MongoClient('mongodb://ich_editor:verystrongpassword@mongo.edu.itcareerhub.de:27017/?readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=ich_edit')
 filter={
     'N': 3
 }
@@ -66,10 +57,7 @@ result = client['ich_edit']['06032026_ptm_Elena'].find(
   filter=filter
 )
 // 5. Вывести пользователей в возрасте от 30 до 40 (включая концы)
-# Requires the PyMongo package.
-# https://api.mongodb.com/python/current
 
-client = MongoClient('mongodb://ich_editor:verystrongpassword@mongo.edu.itcareerhub.de:27017/?readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=ich_edit')
 result = client['ich_edit']['06032026_ptm_Elena'].aggregate([
     {
         '$match': {
@@ -82,12 +70,10 @@ result = client['ich_edit']['06032026_ptm_Elena'].aggregate([
 ])
 // 6. В коллекции users_NAME  добавить к возрасту каждого 3 года, использовав функцию $inc
 db["06032026_ptm_Elena"].updateMany({}, { $inc: { Age: 3 } })
+
 /* 7. Из коллекции movies выбрать названия и год выпуска фильмов. Отсортировать по дате выхода (по возрастанию),
 не показывая идентификатор документа. */
-# Requires the PyMongo package.
-# https://api.mongodb.com/python/current
 
-client = MongoClient('mongodb://ich1:password@mongo.itcareerhub.de/?readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=ich')
 result = client['ich']['imdb'].aggregate([
     {
         '$project': {
