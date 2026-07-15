@@ -1,14 +1,86 @@
 // 1. Сгруппировать по вендорам коллекцию ich.bookings (сколько документов по каждому вендору)
 
+result = client['ich']['bookings'].aggregate([
+    {
+        '$group': {
+            '_id': '$vendor', 
+            'count': {
+                '$sum': 1
+            }
+        }
+    }
+])
 // 2. Найти средний показатель километража с разбивкой по вендорам
 
+result = client['ich']['bookings'].aggregate([
+    {
+        '$group': {
+            '_id': '$vendor', 
+            'avgKm': {
+                '$avg': '$distance'
+            }
+        }
+    }
+])
 // 3. Найти вендора, у которого средний километраж больше 2000 км
 
+result = client['ich']['bookings'].aggregate([
+    {
+        '$group': {
+            '_id': '$vendor', 
+            'avgKm': {
+                '$avg': '$distance'
+            }
+        }
+    }, {
+        '$match': {
+            'avgKm': {
+                '$gt': 2000
+            }
+        }
+    }
+])
 // 4. Используя коллекцию ich.imdb, сгруппировать количество фильмов (а не сериалов!) по годам.
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'type': 'movie'
+        }
+    }, {
+        '$group': {
+            '_id': '$year', 
+            'count_year_movie': {
+                '$sum': 1
+            }
+        }
+    }
+])
 /* 5. Сгруппировать количество фильмов по годам между 1980 и 1990.
 Отсортировать по годам, по возрастанию. */
 
+result = client['ich']['imdb'].aggregate([
+    {
+        '$match': {
+            'type': 'movie', 
+            'year': {
+                '$gte': '1980', 
+                '$lte': '1990'
+            }
+        }
+    }, {
+        '$group': {
+            '_id': '$year', 
+            'count': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$sort': {
+            'year': 1
+        }
+    }
+])
 // 6. Найти 3 самых популярных страны из списка всех фильмов.
 
 
