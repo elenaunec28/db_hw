@@ -1,26 +1,152 @@
 /* 1. Подключиться к Ich.credit_cards  */
 
 /* 2. Посчитать средний возраст клиентов по каждой категории образования. */
+# Requires the PyMongo package.
+
+result = client['ich']['credit_cards'].aggregate([
+    {
+        '$group': {
+            '_id': '$Education_Level', 
+            'avg_age': {
+                '$avg': '$Customer_Age'
+            }
+        }
+    }, {
+        '$project': {
+            '_id': 1, 
+            'avg_age': {
+                '$toInt': '$avg_age'
+            }
+        }
+    }
+])
 
 /* 3. Определить средний кредитный лимит по категориям дохода. */
 
+result = client['ich']['credit_cards'].aggregate([
+    {
+        '$group': {
+            '_id': '$Income_Category', 
+            'avg_credit_limit': {
+                '$avg': '$Credit_Limit'
+            }
+        }
+    }
+])
+
 /* 4. Найти средний возраст клиентов и их средний кредитный лимит для каждого семейного статуса. */
 
+result = client['ich']['credit_cards'].aggregate([
+    {
+        '$group': {
+            '_id': '$Marital_Status', 
+            'avg_age': {
+                '$avg': '$Customer_Age'
+            }, 
+            'avg_credit_limit': {
+                '$avg': '$Credit_Limit'
+            }
+        }
+    }, {
+        '$project': {
+            '_id': 1, 
+            'avg_age': {
+                '$toInt': '$avg_age'
+            }, 
+            'avg_credit_limit': {
+                '$toInt': '$avg_credit_limit'
+            }
+        }
+    }
+])
+
 /* 5. Найти самый часто встречающийся уровень образования среди клиентов */
+
+result = client['ich']['credit_cards'].aggregate([
+    {
+        '$sortByCount': '$Education_Level'
+    }
+])
 
 /* 6. Подключиться к ich.bookings */
 
 /* 7. Найти среднее количество топлива, использованного за поездку. */
 
+result = client['ich']['bookings'].aggregate([
+    {
+        '$group': {
+            '_id': None, 
+            'avg_fuel': {
+                '$avg': {
+                    '$subtract': [
+                        '$init_fuel', '$final_fuel'
+                    ]
+                }
+            }
+        }
+    }
+])
+
 /* 8. Подключиться к ich.sample_training (база почтовых индексов USA) */
 
 /* 9. Найти топ 5 городов с наибольшим населением. */
 
+result = client['ich']['sample_training'].aggregate([
+    {
+        '$group': {
+            '_id': '$city', 
+            'total_pop': {
+                '$sum': '$pop'
+            }
+        }
+    }, {
+        '$sort': {
+            'total_pop': -1
+        }
+    }, {
+        '$limit': 5
+    }
+])
 /* 10. Подсчитать общее количество городов в каждом штате. */
+
+result = client['ich']['sample_training'].aggregate([
+    {
+        '$group': {
+            '_id': '$state', 
+            'city_cnt': {
+                '$sum': 1
+            }
+        }
+    }
+])
 
 /* 11. Найти среднее население по штатам. */
 
+result = client['ich']['sample_training'].aggregate([
+    {
+        '$group': {
+            '_id': '$state', 
+            'avg_pop': {
+                '$avg': '$pop'
+            }
+        }
+    }
+])
 /* 12. Найти 10 самых крупных по населению ZIP кодов (почтовых индексов) штата IL (Иллинойс). */
+
+result = client['ich']['sample_training'].aggregate([
+    {
+        '$match': {
+            'state': 'IL'
+        }
+    }, {
+        '$sort': {
+            'pop': -1
+        }
+    }, {
+        '$limit': 10
+    }
+])
 
 
 
