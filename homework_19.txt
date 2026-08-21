@@ -2,13 +2,117 @@
 
 // 1. Найдите трек с наивысшими показателями Danceability и Energy (в сумме)
 
+result = client['ich']['Spotify_Youtube'].aggregate([
+    {
+        '$addFields': {
+            'total': {
+                '$add': [
+                    '$Danceability', '$Energy'
+                ]
+            }
+        }
+    }, {
+        '$sort': {
+            'total': -1
+        }
+    }, {
+        '$limit': 1
+    }, {
+        '$project': {
+            '_id': 0, 
+            'Track': 1, 
+            'Danceability': 1, 
+            'Energy': 1, 
+            'total': 1
+        }
+    }
+])
 // 2. У какого трека (но не compilation) самая большая длительность?
 
+result = client['ich']['Spotify_Youtube'].aggregate([
+    {
+        '$match': {
+            'Album_type': {
+                '$ne': 'compilation'
+            }
+        }
+    }, {
+        '$sort': {
+            'Duration_ms': -1
+        }
+    }, {
+        '$limit': 1
+    }, {
+        '$project': {
+            '_id': 0, 
+            'Track': 1, 
+            'Album_type': 1, 
+            'Duration_ms': 1
+        }
+    }
+])
 // 3. В каком одном альбоме самое большее количество треков?
 
+result = client['ich']['Spotify_Youtube'].aggregate([
+    {
+        '$group': {
+            '_id': '$Album', 
+            'count': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$sort': {
+            'count': -1
+        }
+    }, {
+        '$limit': 1
+    }
+])
 /* 4. Сколько просмотров видео на youtube у трека
 с самым высоким количеством прослушиваний на spotify (Stream)? */
 
+result = client['ich']['Spotify_Youtube'].aggregate([
+    {
+        '$sort': {
+            'Stream': -1
+        }
+    }, {
+        '$limit': 1
+    }, {
+        '$project': {
+            '_id': 0, 
+            'Track': 1, 
+            'Stream': 1, 
+            'Views': 1
+        }
+    }
+])
 /* 5. Экспортируйте 20 самых популярных (прослушивания или просмотры) треков
 по версиям youtube и spotify и импортируйте в базу ich_edit их
 с именами top20youtube и top20spotify, и добавьте им свои имена для уникальности. */
+
+result = client['ich']['Spotify_Youtube'].aggregate([
+    {
+        '$sort': {
+            'Views': -1
+        }
+    }, {
+        '$limit': 20
+    }
+])
+
+
+result = client['ich']['Spotify_Youtube'].aggregate([
+    {
+        '$sort': {
+            'Stream': -1
+        }
+    }, {
+        '$limit': 20
+    }
+])
+
+top20youtube_ElenaUkr
+top20spotify_ElenaUkr
+
