@@ -2,9 +2,76 @@
 Подсказка - нам понадобится 2 этапа агрегации : $match и $group
 */
 
+result = client['sample_airbnb']['listingsAndReviews'].aggregate([
+    {
+        '$match': {
+            'address.market': {
+                '$in': [
+                    'Kauai', 'Maui', 'Oahu', 'The Big Island'
+                ]
+            }
+        }
+    }, {
+        '$group': {
+            '_id': None, 
+            'average_price': {
+                '$avg': '$price'
+            }
+        }
+    }, {
+        '$project': {
+            '_id': 0, 
+            'average_price': 1
+        }
+    }
+])
 /* 2.1. Подсчитайте в коллекции Atlas: sample_mflix.movies,
  сколько фильмов имеют imdb рейтинг выше 8 и выходили в период с 2015 до 2023 года.*/
 
+result = client['sample_mflix']['movies'].aggregate([
+    {
+        '$match': {
+            'year': {
+                '$gte': 2015, 
+                '$lte': 2023
+            }, 
+            'imdb.rating': {
+                '$type': 'number', 
+                '$gt': 8
+            }
+        }
+    }, {
+        '$count': 'moviesCount'
+    }
+])
 
 /* 2.2. Какой из фильмов, вышедших в период с 2015 по 2023 имеет самый высокий рейтинг? */
 
+result = client['sample_mflix']['movies'].aggregate([
+    {
+        '$match': {
+            'year': {
+                '$gte': 2015, 
+                '$lte': 2023
+            }, 
+            'imdb.rating': {
+                '$nin': [
+                    None, ''
+                ]
+            }
+        }
+    }, {
+        '$sort': {
+            'imdb.rating': -1
+        }
+    }, {
+        '$limit': 1
+    }, {
+        '$project': {
+            '_id': 0, 
+            'title': 1, 
+            'year': 1, 
+            'imdb.rating': 1
+        }
+    }
+])
