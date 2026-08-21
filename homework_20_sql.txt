@@ -11,23 +11,51 @@
 Нужно воспользоваться оператором case чтобы определить для каждого кода условие,
 по которому будет выводится его развернутое описание (1 предложение). */
 
-
+SELECT title, rating,
+    CASE rating
+        WHEN 'G' THEN 'Все возрастные категории'
+        WHEN 'PG' THEN 'Рекомендуется контроль родителей'
+        WHEN 'PG-13' THEN 'Осторожно, для детей до 13 лет'
+        WHEN 'R' THEN 'Ограничено. Для детей до 17 лет требуется сопровождение взрослого'
+        WHEN 'NC-17' THEN 'Только для зрителей старше 17 лет'
+    END AS rating_description
+FROM film;
 
 /* 3. Выведите количество фильмов в каждой категории рейтинга.
 Используем group by. */
 
+SELECT rating, COUNT(*) AS films_count
+FROM film
+GROUP BY rating;
 
 
 /* 4. Используя оконные функции и partition by, выведите
 список названий фильмов, рейтинг и количество фильмов в каждом рейтинге.
 Объясните, чем отличаются результаты предыдущего запроса и запроса в этой задаче. */
 
+SELECT title, rating,
+    COUNT(*) OVER (PARTITION BY rating) AS films_count_in_rating
+FROM film;
 
 /* 5. Изучите таблицы payment и customer. Выведите список всех платежей с указанием
 имени и фамилии каждого заказчика, датой платежа и суммой. */
 
+SELECT
+    c.first_name,
+    c.last_name,
+    p.payment_date,
+    p.amount
+FROM payment as p
+JOIN customer as c ON p.customer_id = c.customer_id;
 
 /* 6. Поменяйте предыдущий запрос так, чтобы дата выводилась в формате
 “число, название месяца, год” (без времени). */
+SELECT
+    c.first_name,
+    c.last_name,
+    DATE_FORMAT(p.payment_date, '%e %M %Y') AS payment_date,
+    p.amount
+FROM payment p
+JOIN customer c ON p.customer_id = c.customer_id;
 
 
